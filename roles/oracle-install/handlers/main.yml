@@ -1,0 +1,7 @@
+---
+- name: restart server
+  command: shutdown -r now "Reboot triggered by Ansible"
+  async: 0
+  poll: 0
+  become_user: root
+  ignore_errors: true  

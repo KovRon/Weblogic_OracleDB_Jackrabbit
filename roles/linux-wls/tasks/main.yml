@@ -1,0 +1,83 @@
+---
+# ==> Configure Linux
+- name: Linux Weblogic | Install required libraries
+  yum: 
+    name: "{{ item }}" 
+    state: "present"
+  with_items: packages_list 
+
+- name: Linux Weblogic | Disable SELinux
+  selinux: 
+    state: "disabled"
+
+- name: Linux Weblogic | Change kernel parameters
+  sysctl: 
+    name: "{{ item.key }}" 
+    value: "{{ item.value }}" 
+    state: "present"
+  with_dict: kernel_params
+
+# ==> Create user and groups
+- name: Linux Weblogic | Create groups
+  group: 
+    name: "{{ oracle_group }}" 
+    state: "present"
+
+- name: Linux Weblogic | Create user
+  user: 
+    name: "{{ oracle_user }}" 
+    groups: "{{ oracle_group }}" 
+    password: "{{ oracle_os_user_pass }}"
+
+# ==> Add limits for oracle user
+- name: Linux Weblogic | Add oracle user limits
+  lineinfile:
+    dest: "/etc/security/limits.conf" 
+    line: "{{ oracle_user }} {{ item.limit }} {{ item.type }} {{ item.value }}"
+  with_items:
+    - { limit: 'soft', type: 'nofile', value: '{{ soft_no_file }}' }
+    - { limit: 'hard', type: 'nofile', value: '{{ hard_no_file }}' }
+    - { limit: 'soft', type: 'nproc', value: '{{ soft_nproc }}' }
+    - { limit: 'hard', type: 'nproc', value: '{{ hard_nproc }}' }
+
+- name: Linux Weblogic | Create a shell profile with file and process limits for oracle user
+  template: 
+    src: "oracle-limits.sh" 
+    dest: "/etc/profile.d/"
+
+# ==> Create Base Directories
+- name: Linux Weblogic | Create Oracle Home directory
+  file: 
+    state: "directory" 
+    path: "{{ middleware_home }}" 
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+
+- name: Linux Weblogic | Create Domain Home directory
+  file: 
+    state: "directory" 
+    path: "{{ domains_home }}" 
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+
+- name: Linux Weblogic | Create Applications Home directory
+  file: 
+    state: "directory" 
+    path: "{{ applications_home }}" 
+    owner: "{{ oracle_user }}" 
+#     group: "{{ oracle_group }}"
+
+- name: Linux Weblogic | Define default time zone
+  file:
+    src: "/usr/share/zoneinfo/Asia/Almaty"
+    dest: "/etc/localtime"
+    owner: root
+    group: root
+    state: link
+    force: yes
+
+- name: Linux Weblogic | Change UTC to default time zone
+  replace:
+    dest: "/etc/sysconfig/clock"
+    regexp: "UTC"
+    replace: "Asia/Almaty"

@@ -1,0 +1,35 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+# Oracle Settings
+export TMP=/tmp
+
+export DISPLAY="127.0.0.1:0.0"
+
+export ORACLE_HOSTNAME={{ ansible_hostname }}
+export ORACLE_UNQNAME={{ oracle_sid }}
+export ORACLE_BASE={{ oracle_base }}
+export ORACLE_HOME={{ oracle_home }}
+export ORACLE_SID={{ oracle_sid }}
+
+PATH=/usr/sbin:$PATH:$ORACLE_HOME/bin
+
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib;
+export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib;
+
+alias cdob='cd $ORACLE_BASE'
+alias cdoh='cd $ORACLE_HOME'
+alias tns='cd $ORACLE_HOME/network/admin'
+alias envo='env | grep ORACLE'
+
+umask 022
+
+PATH=$PATH:$HOME/bin
+
+export PATH

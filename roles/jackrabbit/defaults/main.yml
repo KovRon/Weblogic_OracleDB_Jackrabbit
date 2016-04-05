@@ -1,0 +1,24 @@
+---
+# Jackrabbit standalone server version
+jr_version: 2.12.1
+
+# Location jackrabbit source files
+jr_base_dir: /usr/bin/jackrabbit
+
+# Default host
+jr_host: 0.0.0.0
+
+# Default port
+jr_port: 8080
+
+# Log file location
+jr_log_path: /var/log/jackrabbit
+
+# Init script path
+jr_startup_script_path: /etc/init.d/jackrabbit
+
+# Name of jar file
+jr_jar: "jackrabbit-standalone-{{ jr_version }}.jar"
+
+# URL to jackrabbit standalone server jar
+jr_url: http://www-us.apache.org/dist/jackrabbit/{{ jr_version }}/{{ jr_jar }}

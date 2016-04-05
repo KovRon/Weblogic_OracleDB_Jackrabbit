@@ -1,0 +1,14 @@
+
+# Oracle os user and group
+oracle_user: "oracle"
+oracle_group: "oinstall"
+extra_groups:
+  - dba
+  - oper
+
+# database settings for repository
+dbserver_name: "192.168.33.20"
+dbserver_port: "1521"
+oracle_globalname: "orcl.oradb3.private"
+
+

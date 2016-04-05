@@ -1,0 +1,51 @@
+---
+# Base directory for all source and binary files
+oracle_base: "/oracle/app"
+
+# Directory for storing source files
+installation_folder: "{{ oracle_base }}/installation"
+
+# Fully qualified domain name
+server_hostname: "{{ ansible_fqdn }}"
+
+# Oracle database version
+oracle_install_version: "11gR2"
+
+# Databse home directory
+dbhome_name: "dbhome_1"
+
+# Oracle db eition
+oracle_edition: "EE"
+
+# database administratros group
+oracle_dba_group: "dba"
+
+# database operations group
+oracle_oper_group: "oper"
+
+# Oracle database type
+oracle_database_type: "GENERAL_PURPOSE"
+
+oracle_sid: "orcl"
+
+# Host variable for oracle listeber
+oracle_listener_host: "0.0.0.0"
+
+create_container_database: "true"
+number_of_pdbs: "1"
+oracle_conf_as_container_db: 'true'
+pdb_prefix: "db"
+oracle_pdb_name: "db01"
+oracle_charset: "AL32UTF8"
+oracle_memory_option: "false"
+
+# memory target
+oracle_memory_mb: 1536
+oracle_install_samples: "true"
+oracle_management_option: "DEFAULT"
+oracle_enable_recovery: "true"
+oracle_storage_type: "FILE_SYSTEM_STORAGE"
+oracle_dataloc: "{{ oracle_base }}/oradata"
+oracle_recoveryloc: "{{ oracle_base }}/recovery_area"
+oracle_decline_security_updates: "true"
+hugepages_nr: 578

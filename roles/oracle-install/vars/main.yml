@@ -1,0 +1,19 @@
+---
+installation_folder: "{{ oracle_base }}/installation"
+
+installer_archives:
+  - "linux.x86-x64_11gR2_11.2.0.4_database_1of7.zip"
+  - "linux.x86-x64_11gR2_11.2.0.4_database_2of7.zip"
+  - "linux.x86-x64_11gR2_11.2.0.4_database_3of7.zip"
+  - "linux.x86-x64_11gR2_11.2.0.4_database_4of7.zip"
+  - "linux.x86-x64_11gR2_11.2.0.4_database_5of7.zip"
+  - "linux.x86-x64_11gR2_11.2.0.4_database_6of7.zip"
+  - "linux.x86-x64_11gR2_11.2.0.4_database_7of7.zip"
+
+install_db: INSTALL_DB_SWONLY
+oracle_hostname: "{{ server_hostname }}"
+inventory_os_group: "{{ oracle_group }}"
+inventory_location: "{{ oracle_base }}/inventory"
+oracle_home: "{{ oracle_base }}/{{ oracle_user }}/product/{{ oracle_install_version }}/{{ dbhome_name }}"
+
+host_username: vagrant

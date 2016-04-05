@@ -1,0 +1,47 @@
+---
+- name: Middleware Software | Include necessary variables
+  include_vars: "{{ item }}"
+  with_items:
+    - "roles/jdk-wls/defaults/main.yml"
+    - "roles/oracle-install/defaults/main.yml"
+
+# ==> Install Fussion Middleware Infrastructure
+- name: Middleware Software | Create installer directory
+  file: 
+    path: "{{ fmw_installer_folder }}"
+    state: "directory"
+    owner: "{{ oracle_user }}"
+    group: "{{ oracle_group }}"
+
+- name: Middleware Software | Check WebLogic Server Installer exists
+  stat: 
+    path: "{{ fmw_installer }}"
+  register: fmw_installer_file
+
+- name: Middleware Software | Copy Middleware Installer
+  copy: 
+    src: "{{ fmw_installer }}" 
+    dest: "{{ fmw_installer_folder }}" 
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+
+- name: Middleware Software | Copy file for silent installation
+  template: 
+    src: "silent-weblogic.txt" 
+    dest: "{{ fmw_installer_folder }}" 
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+
+- name: Middleware Software | Copy OraInst.loc
+  template: 
+    src: "oraInst.loc" 
+    dest: "{{ fmw_installer_folder }}"
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+
+- name: Middleware Software | Execute Weblogic installer
+  command: "{{ jdk_folder }}/bin/java -Xms1024m -Xmx1024m -jar 
+            {{ fmw_installer_folder }}/{{ fmw_installer }} -silent -responseFile 
+            {{ fmw_installer_folder }}/silent-weblogic.txt -invPtrLoc 
+            {{ fmw_installer_folder }}/oraInst.loc"
+  become_user: "{{ oracle_user }}"

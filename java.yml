@@ -1,0 +1,8 @@
+---
+# Deploying of the playbook takes about 5 minutes on a virtual machine with 1 CPU and 1 GB RAM
+- name: Install Java
+  hosts: all
+  strategy: free
+  become: True
+  roles:
+    - java

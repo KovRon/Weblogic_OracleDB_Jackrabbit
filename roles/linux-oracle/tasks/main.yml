@@ -1,0 +1,97 @@
+# ==> Include variables from oracle-install role
+- include_vars: "{{ item }}"
+  with_items:
+    - roles/oracle-install/defaults/main.yml
+    - roles/oracle-install/vars/main.yml
+
+# ==> Configure Linux
+- name: Linux ORACLE | Install required libraries
+  yum: 
+    name: "{{ item }}" 
+    state: present
+  with_items: packages_list
+
+- name: Linux ORACLE | Disable SELinux
+  selinux: 
+    state: disabled
+
+- name: Linux ORACLE | Change kernel parameters
+  sysctl: 
+    name: "{{ item.key }}" 
+    value: "{{ item.value }}" 
+    state: present
+  with_dict: kernel_params
+
+# ==> Create users and groups
+- name: Linux ORACLE | Create groups
+  group: 
+    name: "{{ oracle_group }}" 
+    state: present
+
+- name: Linux ORACLE | Add extra groups
+  group: 
+    name: "{{ item }}" 
+    state: present
+  with_items: extra_groups
+
+- name: Linux ORACLE | Create user
+  user: 
+    name: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}" 
+    password: "{{ oracle_os_user_pass }}"
+
+- name: Linux ORACLE | Add oracle user to extra groups
+  user: 
+    name: "{{ oracle_user }}" 
+    groups: "{{ item }}" 
+    append: yes
+  with_items: extra_groups
+
+- name: Linux ORACLE | Create oracle user variables
+  lineinfile:
+    dest: "/home/{{ oracle_user }}/.bashrc"
+    line: "export {{ item }}"
+  with_items:
+    -  "{{ oracle_bash }}"  
+
+# ==> Add limits for oracle user
+- name: Linux ORACLE | Add oracle user limits
+  lineinfile:
+    dest: "/etc/security/limits.conf" 
+    line: "{{ oracle_user }} {{ item.limit }} {{ item.type }} {{ item.value }}"
+  with_items:
+    - { limit: 'soft', type: 'nofile', value: '{{ soft_no_file }}' }
+    - { limit: 'hard', type: 'nofile', value: '{{ hard_no_file }}' }
+    - { limit: 'soft', type: 'nproc', value: '{{ soft_nproc }}' }
+    - { limit: 'hard', type: 'nproc', value: '{{ hard_nproc }}' }
+    - { limit: 'soft', type: 'stack', value: '{{ soft_stack }}' }
+    - { limit: 'hard', type: 'stack', value: '{{ hard_stack }}' }
+    - { limit: 'soft', type: 'memlock', value: '{{ soft_memlock }}' }
+    - { limit: 'hard', type: 'memlock', value: '{{ hard_memlock }}' }
+
+# ==> Create Base directories
+- name: Linux ORACLE | Create Oracle Base directory
+  file: 
+    path: "{{ oracle_base }}"
+    state: directory  
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+
+# ==> Disable transparent hugepages
+- name: Linux ORACLE | Copy script
+  copy: 
+    src: "disable_trans_hugepages.sh"
+    dest: "/tmp/disable_trans_hugepages.sh" 
+    mode: 755
+
+- name: Linux ORACLE | Disable Transparent Huge Pages
+  shell: '/tmp/disable_trans_hugepages.sh'
+
+# ==> Configure huge pages
+- name: Linux ORACLE | Configure kernel for hugepages
+  sysctl: 
+    name: "vm.nr_hugepages" 
+    value: "{{ hugepages_nr }}" 
+    state: present
+  tags:
+    - hugepages

@@ -1,0 +1,93 @@
+---
+- name: ORACLE DB | Create folder for installation files
+  file: 
+    state: directory 
+    path: "{{ installation_folder }}"
+
+# ==> Copy installer files
+- name: ORACLE DB | Copy installer files
+  copy: 
+    src: "{{ item }}" 
+    dest: "{{ installation_folder }}/"
+  with_items: "{{ installer_archives }}"
+
+# ==> extract files
+- name: ORACLE DB | Extract installation files
+  command: "unzip {{ installation_folder }}/{{ item }} -d {{ installation_folder }}/"
+  with_items: "{{ installer_archives }}"
+
+# ==> generate response file
+- name: ORACLE DB | Gerenerate the response file for software only installation
+  template: 
+    src: "db_install.rsp.j2" 
+    dest: "{{ installation_folder }}/db_install.rsp"
+
+# ==> execute installation
+- name: ORACLE DB | Install Product
+  command: "{{ installation_folder}}/database/runInstaller \
+    -silent -ignorePrereq -ignoreSysPrereqs -waitforcompletion -responseFile \
+    {{ installation_folder }}/db_install.rsp"
+
+# ==> execute Inventory command as root
+- name: ORACLE DB | Execute Inventoty root command
+  command: "{{ inventory_location }}/orainstRoot.sh"
+  become_user: root
+
+# ==> execute DB home command as root
+- name: ORACLE DB | Execute DB home root command
+  command: "{{ oracle_home }}/root.sh"
+  become_user: root 
+
+# ==> Create Listener 
+- name: ORACLE DB | Copy listener response file
+  template: 
+    src: "netca.rsp.j2" 
+    dest: "{{ installation_folder }}/netca.rsp"
+
+- name: ORACLE DB | Create listener using netca
+  shell: "{{ oracle_home }}/bin/netca -silent -responseFile {{ installation_folder }}/netca.rsp"
+  environment:
+    - DISPLAY: "127.0.0.1:0.0"
+    - ORACLE_HOME: "{{ oracle_home }}"
+
+- name: ORACLE DB | Copy response file for dbca
+  template: 
+    src: "dbca.rsp.j2" 
+    dest: "{{ installation_folder }}/dbca.rsp"
+
+- name: ORACLE DB | Create database
+  command: "{{ oracle_home }}/bin/dbca -silent -responseFile {{ installation_folder }}/dbca.rsp"
+
+- name: ORACLE DB | Change oratab
+  lineinfile: 
+    dest: "/etc/oratab" 
+    regexp: "^{{ oracle_sid }}:{{ oracle_home }}:N" 
+    line: "{{ oracle_sid }}:{{ oracle_home }}:Y"
+  become_user: root
+
+- name: ORACLE DB | Copy init.d oracle script to /etc/init.d
+  template: 
+    src: "oradb.j2"
+    dest: "/etc/init.d/oradb" 
+    mode: 0755
+  become_user: root
+
+- name: ORACLE DB | Ensure oracle db service started
+  service:
+    name: oradb
+    state: started
+    enabled: yes  
+  become_user: root  
+
+- name: ORACLE DB | Create trigger for autostart pluggable db's
+  copy: 
+    src: "start-pluggable-dbs.sh" 
+    dest: "{{ installation_folder }}/"
+    mode: 0755
+  tags:
+    - start-pluggable
+
+- name: ORACLE DB | Start pluggable databases
+  shell: "{{ installation_folder }}/start-pluggable-dbs.sh"
+  tags:
+    - start-pluggable

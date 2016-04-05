@@ -1,0 +1,9 @@
+---
+# Deploying of the playbook takes about 14 minutes on a virtual machine with 1 CPU and 1 GB RAM
+- name: Install Apache jackrabbit
+  hosts: jackrabbit
+  become: True
+  roles:
+    - java
+    - jackrabbit
+    

@@ -1,0 +1,116 @@
+---
+- name: Middleware Domain | Include necessary variables
+  include_vars: "{{ item }}"
+  with_items:
+    - "roles/jdk-wls/defaults/main.yml"
+    - "roles/oracle-install/defaults/main.yml"
+    
+# ==> Create Repository in Database
+- name: Middleware Domain | Password response file for repository creation
+  template:
+    src: "passwords.txt"
+    dest: "{{ fmw_installer_folder }}" 
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+
+- name: Middleware Domain | Copy create repository script
+  template:
+    src: "create_repo.sh" 
+    dest: "{{ fmw_installer_folder }}" 
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}" 
+    mode: "0755"
+
+- name: Middleware Domain | Execute create repository script
+  shell: "{{ fmw_installer_folder }}/create_repo.sh"
+    
+# ==> Create new domain
+- name: Middleware Domain | Copy create domain python script
+  template:
+    src: "create-domain.py" 
+    dest: "{{ fmw_installer_folder }}" 
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+
+- name: Middleware Domain | Execute create domain script
+  shell: "{{ weblogic_home }}/common/bin/wlst.sh {{ fmw_installer_folder }}/create-domain.py"
+  become_user: "{{ oracle_user }}"
+    
+# ==> Start nodemanager
+- name: Middleware Domain | Create security directory to Nodemanager Home
+  file:
+    state: "directory" 
+    path: "{{ nodemanager_home }}/security" 
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+
+- name: Middleware Domain | Copy DemoIdentity key store to nodemanager home
+  copy:
+    src: "{{ domain_home }}/security/DemoIdentity.jks"
+    dest: "{{ nodemanager_home }}/security/DemoIdentity.jks"
+    remote_src: "true"
+  become_user: "{{ oracle_user }}"
+
+- name: Middleware Domain | Copy Nodemanager Properties file
+  template:
+    src: "nodemanager.properties" 
+    dest: "{{ nodemanager_home }}/" 
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+      
+# ==> Create startup script for nodemanager
+- name: Middleware Domain | Copy init.d startup script
+  template: 
+    src: "nodemgr.j2" 
+    dest: "/etc/init.d/nodemgr" 
+    mode: "0755"
+
+- name: Middleware Domain | Start Node Manager service and ensure noedmgr service is in autostart
+  service:
+    name: nodemgr
+    pattern: "/etc/init.d/nodemgr"
+    state: started
+    enabled: on
+
+# ==> Start AdminServer
+- name: Middleware Domain | Create security folder on Admin Server
+  file:
+    state: "directory"
+    path: "{{ domains_home }}/{{ domain_name }}/servers/{{ admin_server_name }}/security"
+    owner: "{{ oracle_user }}"
+    group: "{{ oracle_group }}"
+
+- name: Middleware Domain | Create boot.properties file
+  template:
+    src: "boot.properties" 
+    dest: "{{ domains_home }}/{{ domain_name }}/servers/{{ admin_server_name }}/security/" 
+    owner: "{{ oracle_user }}" 
+    group: "{{ oracle_group }}"
+
+- name: Middleware Domain | Copy Admin Server start-up script
+  template: 
+    src: "start-admin-server.py"
+    dest: "{{ fmw_installer_folder }}" 
+    owner: "{{ oracle_user }}"
+    group: "{{ oracle_group }}" 
+    mode: "0755"
+
+- name: Middleware Domain | Execute start Admin Server script
+  shell: "{{ weblogic_home }}/common/bin/wlst.sh {{ fmw_installer_folder }}/start-admin-server.py"
+  become_user: "{{ oracle_user }}"
+
+- name: Middleware Domain | Wait for Admin Server to startup
+  wait_for: 
+    port: "{{ admin_server_port }}" 
+    delay: "2" 
+    timeout: "60"
+  
+# ==> Create Environment Variables for Oracle user
+- name: Middleware Domain | Add Oracle Home environment variables
+  lineinfile: 
+    dest: "/home/{{ oracle_user }}/.bashrc" 
+    line: "{{ item }}"
+  with_items:
+    - "export ORACLE_HOME={{ middleware_home }}"
+    - "export DOMAINS_HOME={{ domains_home }}"
+    - "export APPLICATIONS_HOME={{ applications_home }}"

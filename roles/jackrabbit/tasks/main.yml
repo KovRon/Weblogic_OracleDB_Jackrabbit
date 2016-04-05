@@ -1,0 +1,48 @@
+---
+- name: Jackrabbit | Create base directory 
+  file: 
+    path: "{{ jr_base_dir }}" 
+    state: directory 
+    owner: root 
+    group: root 
+    mode: 0755
+
+- name: Jackrabbit | Download jar file
+  get_url: 
+    url: "{{ jr_url }}"
+    dest: "{{ jr_base_dir }}/{{ jr_jar }}" 
+    owner: "root" 
+    group: "root" 
+    mode: 0755
+
+- name: Jackrabbit | Create symlink
+  file: 
+    src: "{{ jr_base_dir }}/{{ jr_jar }}" 
+    dest: "{{ jr_base_dir }}/jackrabbit.jar" 
+    owner: "root" 
+    group: "root" 
+    state: "link"
+
+- name: Jackrabbit | Install startup script
+  template:
+    src: jackrabbit.sh.j2
+    dest: "{{ jr_startup_script_path }}" 
+    owner: "root" 
+    group: "root" 
+    mode: 0755
+
+- name: Jackrabbit | Install startup script dependencies
+  yum: 
+    name: "curl" 
+    state: "latest"
+
+- name: Jackrabbit | Create log path
+  file: 
+    path: "{{ jr_log_path }}" 
+    state: "directory"
+
+- name: Jackrabbit | Ensure service is running
+  service: 
+    name: "jackrabbit" 
+    state: started 
+    enabled: yes

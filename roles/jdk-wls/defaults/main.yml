@@ -1,0 +1,31 @@
+---
+
+# Default Java distribution
+oracle_java_distribution: jdk
+
+# Default major version
+oracle_java_version_major: 1
+
+# Default minor version
+oracle_java_version_minor: 7
+
+# Default patch version
+oracle_java_version_patch: 0
+
+# Default update version
+oracle_java_version_update: 80
+
+# Default architerture
+oracle_java_arch: 64
+
+# Default development branch
+oracle_java_branch: "15"
+
+# JDK download URL
+jdk_url: "http://download.oracle.com/otn-pub/java/jdk/{{ oracle_java_version_minor }}u{{ oracle_java_version_update }}-b{{ oracle_java_branch }}/{{ oracle_java_distribution }}-{{ oracle_java_version_minor }}u{{ oracle_java_version_update }}-linux-x{{ oracle_java_arch }}.rpm"
+
+# JDK installer
+jdk_rpm: "jdk-{{ oracle_java_version_minor }}u{{ oracle_java_version_update }}-linux-x{{ oracle_java_arch }}.rpm"
+
+# JDK target folder
+jdk_folder: "/usr/java/{{ oracle_java_distribution }}{{ oracle_java_version_major }}.{{ oracle_java_version_minor }}.{{ oracle_java_version_patch }}_{{ oracle_java_version_update }}"
