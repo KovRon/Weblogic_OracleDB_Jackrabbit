@@ -9,7 +9,7 @@
     # User Passwords
     - group_vars/secrets.yml
     # WebLogic Server variables
-    - group_vars/mw_vas.yml
+    - group_vars/mw_vars.yml
   
   roles:
     - linux-wls
