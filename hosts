@@ -9,4 +9,3 @@ oracledb ansible_ssh_host=192.168.33.20 ansible_ssh_user=vagrant
 [jackrabbit]
 
 jackrabbit ansible_ssh_host=192.168.33.30 ansible_ssh_user=vagrant
-

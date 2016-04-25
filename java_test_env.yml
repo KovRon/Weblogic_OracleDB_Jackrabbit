@@ -1,0 +1,54 @@
+---
+- name: PLAY | Configure CentOS 6 with Oracle Database 11g
+  hosts: oracledb
+  become: True
+  strategy: Free
+  vars_files:
+    # User defined variables for infrastructure
+    - group_vars/common.yml
+    # User Passwords
+    - group_vars/secrets.yml
+  
+  roles:
+    - role: java
+    - role: linux-oracle
+    - role: oracle-install
+      become_user: "{{ oracle_user }}"
+
+  pre_tasks:
+    # ==> Fix hosts file. Remove hostname from local loop. A workaround for vagrant
+    # adding hostname to local loop
+    - name: fix host file 127.0.0.1 entry
+      lineinfile:
+        dest: '/etc/hosts'
+        regexp: '^127\.0\.0\.1'
+        line: '127.0.0.1 {{ ansible_hostname }} localhost.localdomain localhost4 localhost4.localdomain4'
+        owner: root
+        group: root 
+        mode: 0644
+
+#########################
+- name: PLAY | Configure CentOS 6.7 with WebLogic 12c domain
+  hosts: weblogic
+  become: True
+  vars_files:
+    # User defined variables for infrastructure
+    - group_vars/common.yml
+    # User Passwords
+    - group_vars/secrets.yml
+    # WebLogic Server variables
+    - group_vars/mw_vars.yml
+  
+  roles:
+    - linux-wls
+    - jdk-wls
+    - fmw-software
+    - fmw-domain
+
+#########################
+- name: PLAY | Install Apache jackrabbit
+  hosts: jackrabbit
+  become: True
+  roles:
+    - java
+    - jackrabbit    
