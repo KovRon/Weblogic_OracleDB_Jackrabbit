@@ -21,9 +21,9 @@ packages_list:
 # Kernel parameters for Fusion Midleware server
 kernel_params:
   # max shared seg size (bytes)
-  kernel.shmmax: 1073741824
+  kernel.shmmax: 2147483648
   # (SHMMAX/getpagesize()*(SHMMNI/16)) 
-  kernel.shmall: 262144
+  kernel.shmall: 524288
   # For 1Gbps with 1ms latency 16MB buffer
   net.core.rmem_max: 16777216
   net.core.wmem_max: 16777216
@@ -34,7 +34,7 @@ kernel_params:
   vm.dirty_background_ratio: 5
   vm.dirty_ratio: 10
   # Max open file descriptors 512 * db processes + room for os
-  fs.file-max: 131072
+  fs.file-max: 262144
   # Shorten keep alive of connections
   net.ipv4.tcp_keepalive_time: 300
   net.ipv4.tcp_keepalive_intvl: 60

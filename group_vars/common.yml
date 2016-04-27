@@ -7,7 +7,7 @@ extra_groups:
   - oper
 
 # database settings for repository
-dbserver_name: "192.168.33.20"
+dbserver_name: "{{ hostvars[groups['java_oracledb'][0]].ansible_ssh_host }}"
 dbserver_port: "1521"
 oracle_globalname: "orcl.oradb3.private"
 

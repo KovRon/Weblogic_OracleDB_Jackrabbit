@@ -9,7 +9,7 @@
   yum: 
     name: "{{ item }}" 
     state: present
-  with_items: packages_list
+  with_items: "{{ packages_list }}"
 
 - name: Linux ORACLE | Disable SELinux
   selinux: 
@@ -20,7 +20,7 @@
     name: "{{ item.key }}" 
     value: "{{ item.value }}" 
     state: present
-  with_dict: kernel_params
+  with_dict: "{{ kernel_params }}"
 
 # ==> Create users and groups
 - name: Linux ORACLE | Create groups
@@ -32,7 +32,7 @@
   group: 
     name: "{{ item }}" 
     state: present
-  with_items: extra_groups
+  with_items: "{{ extra_groups }}"
 
 - name: Linux ORACLE | Create user
   user: 
@@ -45,14 +45,13 @@
     name: "{{ oracle_user }}" 
     groups: "{{ item }}" 
     append: yes
-  with_items: extra_groups
+  with_items: "{{ extra_groups }}"
 
 - name: Linux ORACLE | Create oracle user variables
   lineinfile:
     dest: "/home/{{ oracle_user }}/.bashrc"
     line: "export {{ item }}"
-  with_items:
-    -  "{{ oracle_bash }}"  
+  with_items: "{{ oracle_bash }}"  
 
 # ==> Add limits for oracle user
 - name: Linux ORACLE | Add oracle user limits

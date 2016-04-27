@@ -1,11 +1,12 @@
-[weblogic]
+[java_weblogic]
 
 weblogic ansible_ssh_host=192.168.33.10 ansible_ssh_user=vagrant
 
-[oracledb]
+[java_oracledb]
 
 oracledb ansible_ssh_host=192.168.33.20 ansible_ssh_user=vagrant
 
-[jackrabbit]
+[apache_jackrabbit]
 
 jackrabbit ansible_ssh_host=192.168.33.30 ansible_ssh_user=vagrant
+

@@ -32,7 +32,8 @@
     --slave /usr/bin/javadoc javadoc /usr/java/{{ oracle_java_version_dir }}/bin/javadoc
     --slave /usr/bin/javaws javaws /usr/java/{{ oracle_java_version_dir }}/bin/javaws
     --slave /usr/bin/jcontrol jcontrol /usr/java/{{ oracle_java_version_dir }}/bin/jcontrol
-  when: oracle_java_distribution == "jdk" and java_alternative.stdout == ""
+  when: (oracle_java_distribution == "jdk") 
+        and (java_alternative.stdout == "")
 
 - name: JAVA | Install Java alternative for JRE
   shell: >
@@ -40,7 +41,8 @@
     --install /usr/bin/java java /usr/java/{{ oracle_java_version_dir }}/bin/java {{ oracle_java_version_priority }}
     --slave /usr/bin/javaws javaws /usr/java/{{ oracle_java_version_dir }}/bin/javaws
     --slave /usr/bin/jcontrol jcontrol /usr/java/{{ oracle_java_version_dir }}/bin/jcontrol
-  when: oracle_java_distribution == "jre" and java_alternative.stdout == ""
+  when: (oracle_java_distribution == "jre") 
+        and (java_alternative.stdout == "")
 
 - name: JAVA | Check which link is set as the default
   shell: >
@@ -53,7 +55,7 @@
 
 - name: JAVA | Set default alternative
   shell: "alternatives --set java /usr/java/{{ oracle_java_version_dir }}/bin/java"
-  when: oracle_java_default
+  when: (oracle_java_default == True)
         and (java_alternative_set.stdout != oracle_java_version_priority)
 
 - name: JAVA | Create temporary directory

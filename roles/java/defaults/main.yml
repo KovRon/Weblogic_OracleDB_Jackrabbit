@@ -21,7 +21,7 @@ oracle_java_arch: 64
 # Default development branch
 oracle_java_branch: "15"
 
-# Indicates whether this Java versin should be set as default alternative
+# Indicates whether this Java version should be set as default alternative
 oracle_java_default: false
 
 # Flag which triggers the package cleaning

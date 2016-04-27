@@ -84,10 +84,7 @@
     src: "start-pluggable-dbs.sh" 
     dest: "{{ installation_folder }}/"
     mode: 0755
-  tags:
-    - start-pluggable
 
 - name: ORACLE DB | Start pluggable databases
   shell: "{{ installation_folder }}/start-pluggable-dbs.sh"
-  tags:
-    - start-pluggable
+...

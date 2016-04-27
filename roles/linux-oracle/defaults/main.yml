@@ -31,9 +31,9 @@ kernel_params:
   # max num of segs system wide 
   kernel.shmmni: 4096
   # max shared seg size (bytes) 1 GB Half of the physical memory (for 2GB virtual machine)
-  kernel.shmmax: 1073741824
+  kernel.shmmax: 4398046511104
   # (SHMMAX/getpagesize()*(SHMMNI/16)) 1.5 GB Shared memory 500mb for linux kernel (for 2GB virtual machine) 
-  kernel.shmall: 262144
+  kernel.shmall: 393216
   # For 1Gbps with 1ms latency 16MB buffer
   net.core.rmem_max: 16777216
   net.core.wmem_max: 16777216
@@ -44,7 +44,7 @@ kernel_params:
   vm.dirty_background_ratio: 5
   vm.dirty_ratio: 10
   # Max open file descriptors 512 * db processes + room for os
-  fs.file-max: 262144 
+  fs.file-max: 409600
   # Shorten keep alive of connections
   net.ipv4.tcp_keepalive_time: 300
   net.ipv4.tcp_keepalive_intvl: 60
@@ -65,7 +65,7 @@ hard_memlock: 1887437
 
 # Oracle user bash settings 
 oracle_bash:
-  - TMP=/tmp
+  - TMP=/TMP
   - DISPLAY="127.0.0.1:0.0"
   - ORACLE_HOSTNAME={{ ansible_hostname }}
   - ORACLE_UNQNAME={{ oracle_sid }}
