@@ -4,7 +4,7 @@
   yum: 
     name: "{{ item }}" 
     state: "present"
-  with_items: packages_list 
+  with_items: "{{ packages_list }}"
 
 - name: Linux Weblogic | Disable SELinux
   selinux: 
@@ -15,7 +15,7 @@
     name: "{{ item.key }}" 
     value: "{{ item.value }}" 
     state: "present"
-  with_dict: kernel_params
+  with_dict: "{{ kernel_params }}"
 
 # ==> Create user and groups
 - name: Linux Weblogic | Create groups
