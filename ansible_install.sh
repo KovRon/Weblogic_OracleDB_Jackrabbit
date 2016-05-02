@@ -1,15 +1,18 @@
 #!/bin/bash
 
-sudo yum install vim git zsh curl -y
-sed -i 's/robbyrussell/amuse/g' ~/.zshrc
-sudo easy_install pip
-sudo pip install paramiko PyYAML Jinja2 httplib2 six
-sudo git clone https://github.com/ansible/ansible.git --recursive /opt/ansible
-sudo chown -R vagrant:vagrant /opt/ansible
-cd /opt/ansible
+ANSIBLE_ENV=/opt/ansible/hacking/env-setup
+ANSIBLE_PATH=/opt/ansible
+VAGRANT_USER_HOME=/home/vagrant
+
+yum -y install gcc gcc-c++ kernel-devel python-devel libxslt-devel libffi-devel openssl-devel git 
+wget https://bootstrap.pypa.io/ez_setup.py -O - | sudo python
+easy_install pip 
+pip install paramiko PyYAML Jinja2 httplib2 six pycrypto
+git clone https://github.com/ansible/ansible.git --recursive $ANSIBLE_PATH
+cd $ANSIBLE_PATH
 git pull --rebase
 git submodule update --init --recursive
-sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-echo 'source /opt/ansible/hacking/env-setup -q' >> /home/vagrant/.zshrc
-source /opt/ansible/hacking/env-setup -q
-ansible --version
+echo 'source '$ANSIBLE_ENV' -q' >> $VAGRANT_USER_HOME/.bashrc
+source $ANSIBLE_ENV -q
+chown -R vagrant:vagrant $ANSIBLE_PATH
+chown -R vagrant:vagrant $VAGRANT_USER_HOME
