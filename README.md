@@ -19,10 +19,12 @@ $ vagrant box add boxcutter/centos67
 ___________________________________________________________
 
 Each Ansible role can be deployed separatelly on VMs or together on all at the same time.
-(Notice: Server with WebLogic demands started and configured VM with OracleDB) 
 
+Deployment requirement: 
+1) Download Oracle 11g R2 installation files and Fussion Middleware Infrastructure 12.1.3 file. Put them into "files" directories to oracle-install and fmw-software roles. Files have to get names according to examples in these folders.
+2) OracleDB VM necessary start and configure before WebLogic Server setup.
 
-Ansible commands for each VM:
+Ansible commands separated by roles:
 
 $ ansible-playbook oracledb.yml
 
